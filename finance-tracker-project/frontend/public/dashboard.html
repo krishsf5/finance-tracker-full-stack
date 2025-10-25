@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - FinanceTracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-page">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-chart-line"></i>
+                <span>FinanceTracker</span>
+            </div>
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <li class="menu-item active" data-view="dashboard">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </li>
+            <li class="menu-item" data-view="transactions">
+                <i class="fas fa-receipt"></i>
+                <span>Transactions</span>
+            </li>
+            <li class="menu-item" data-view="budgets">
+                <i class="fas fa-piggy-bank"></i>
+                <span>Budgets</span>
+            </li>
+            <li class="menu-item" data-view="reports">
+                <i class="fas fa-chart-pie"></i>
+                <span>Reports</span>
+            </li>
+            <li class="menu-item" data-view="goals">
+                <i class="fas fa-bullseye"></i>
+                <span>Goals</span>
+            </li>
+            <li class="menu-item" data-view="settings">
+                <i class="fas fa-cog"></i>
+                <span>Settings</span>
+            </li>
+        </ul>
+        
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                    <span class="user-name" id="userName">User</span>
+                    <span class="user-email" id="userEmail">user@example.com</span>
+                </div>
+            </div>
+            <button class="logout-btn" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="header-right">
+                <div class="balance-display">
+                    <span class="balance-label">Balance</span>
+                    <span class="balance-amount" id="currentBalance">$0.00</span>
+                </div>
+                <button class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard View -->
+        <div class="view-content" id="dashboardView">
+            <!-- Summary Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon income">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Total Income</h3>
+                        <p class="metric-value" id="totalIncome">$0.00</p>
+                        <span class="metric-period">This Month</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon expense">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Total Expenses</h3>
+                        <p class="metric-value" id="totalExpenses">$0.00</p>
+                        <span class="metric-period">This Month</span>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-icon balance">
+                        <i class="fas fa-wallet"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Net Income</h3>
+                        <p class="metric-value" id="netIncome">$0.00</p>
+                        <span class="metric-period">This Month</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h2>Quick Actions</h2>
+                <div class="action-buttons">
+                    <button class="action-btn income" onclick="openTransactionModal('income')">
+                        <i class="fas fa-plus"></i>
+                        <span>Add Income</span>
+                    </button>
+                    <button class="action-btn expense" onclick="openTransactionModal('expense')">
+                        <i class="fas fa-minus"></i>
+                        <span>Add Expense</span>
+                    </button>
+                    <button class="action-btn budget" onclick="openBudgetModal()">
+                        <i class="fas fa-piggy-bank"></i>
+                        <span>Create Budget</span>
+                    </button>
+                    <button class="action-btn goal" onclick="openGoalModal()">
+                        <i class="fas fa-bullseye"></i>
+                        <span>Set Goal</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Budget Status -->
+            <div class="budget-status">
+                <h2>Budget Status</h2>
+                <div class="budget-cards" id="budgetCards">
+                    <div class="no-budgets">
+                        <i class="fas fa-piggy-bank"></i>
+                        <p>No budgets created yet</p>
+                        <button class="btn btn-primary" onclick="openBudgetModal()">Create Your First Budget</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="recent-transactions">
+                <div class="section-header">
+                    <h2>Recent Transactions</h2>
+                    <a href="#" onclick="showView('transactions')" class="view-all">View All</a>
+                </div>
+                <div class="transactions-list" id="recentTransactionsList">
+                    <div class="no-transactions">
+                        <i class="fas fa-receipt"></i>
+                        <p>No transactions yet</p>
+                        <button class="btn btn-primary" onclick="openTransactionModal('expense')">Add Your First Transaction</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions View -->
+        <div class="view-content hidden" id="transactionsView">
+            <div class="view-header">
+                <h2>Transactions</h2>
+                <div class="view-actions">
+                    <div class="filters">
+                        <select id="typeFilter">
+                            <option value="all">All Types</option>
+                            <option value="income">Income</option>
+                            <option value="expense">Expense</option>
+                        </select>
+                        <select id="categoryFilter">
+                            <option value="all">All Categories</option>
+                        </select>
+                        <input type="date" id="dateFilter" placeholder="Filter by date">
+                    </div>
+                    <button class="btn btn-primary" onclick="openTransactionModal('expense')">
+                        <i class="fas fa-plus"></i>
+                        Add Transaction
+                    </button>
+                </div>
+            </div>
+            
+            <div class="transactions-table-container">
+                <table class="transactions-table" id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsTableBody">
+                        <tr class="no-data">
+                            <td colspan="6">
+                                <div class="no-transactions">
+                                    <i class="fas fa-receipt"></i>
+                                    <p>No transactions found</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Budgets View -->
+        <div class="view-content hidden" id="budgetsView">
+            <div class="view-header">
+                <h2>Budgets</h2>
+                <button class="btn btn-primary" onclick="openBudgetModal()">
+                    <i class="fas fa-plus"></i>
+                    Create Budget
+                </button>
+            </div>
+            
+            <div class="budgets-grid" id="budgetsGrid">
+                <div class="no-budgets">
+                    <i class="fas fa-piggy-bank"></i>
+                    <p>No budgets created yet</p>
+                    <button class="btn btn-primary" onclick="openBudgetModal()">Create Your First Budget</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports View -->
+        <div class="view-content hidden" id="reportsView">
+            <div class="view-header">
+                <h2>Reports & Analytics</h2>
+                <div class="report-filters">
+                    <select id="reportPeriod">
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="reports-grid">
+                <div class="report-card">
+                    <h3>Spending by Category</h3>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <h3>Income vs Expenses</h3>
+                    <div class="chart-container">
+                        <canvas id="incomeExpenseChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="report-card">
+                    <h3>Monthly Trends</h3>
+                    <div class="chart-container">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Goals View -->
+        <div class="view-content hidden" id="goalsView">
+            <div class="view-header">
+                <h2>Savings Goals</h2>
+                <button class="btn btn-primary" onclick="openGoalModal()">
+                    <i class="fas fa-plus"></i>
+                    Add Goal
+                </button>
+            </div>
+            
+            <div class="goals-grid" id="goalsGrid">
+                <div class="no-goals">
+                    <i class="fas fa-bullseye"></i>
+                    <p>No goals set yet</p>
+                    <button class="btn btn-primary" onclick="openGoalModal()">Set Your First Goal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings View -->
+        <div class="view-content hidden" id="settingsView">
+            <div class="view-header">
+                <h2>Settings</h2>
+            </div>
+            
+            <div class="settings-sections">
+                <div class="settings-section">
+                    <h3>Profile</h3>
+                    <form class="settings-form" id="profileForm">
+                        <div class="form-group">
+                            <label for="profileName">Name</label>
+                            <input type="text" id="profileName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" name="email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </form>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Categories</h3>
+                    <div class="categories-management">
+                        <div class="add-category">
+                            <input type="text" id="newCategory" placeholder="Add new category">
+                            <button class="btn btn-primary" onclick="addCategory()">Add</button>
+                        </div>
+                        <div class="categories-list" id="categoriesList">
+                            <!-- Categories will be populated here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3>Data Management</h3>
+                    <div class="data-actions">
+                        <button class="btn btn-outline" onclick="exportData()">
+                            <i class="fas fa-download"></i>
+                            Export Data
+                        </button>
+                        <button class="btn btn-outline" onclick="importData()">
+                            <i class="fas fa-upload"></i>
+                            Import Data
+                        </button>
+                        <button class="btn btn-danger" onclick="clearAllData()">
+                            <i class="fas fa-trash"></i>
+                            Clear All Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <!-- Transaction Modal -->
+    <div class="modal" id="transactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="transactionModalTitle">Add Transaction</h3>
+                <button class="modal-close" onclick="closeModal('transactionModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="transactionForm">
+                <div class="form-group">
+                    <label for="transactionType">Type</label>
+                    <select id="transactionType" name="type" required>
+                        <option value="income">Income</option>
+                        <option value="expense">Expense</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transactionAmount">Amount</label>
+                    <input type="number" id="transactionAmount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="transactionCategory">Category</label>
+                    <select id="transactionCategory" name="category" required>
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="transactionDescription">Description</label>
+                    <input type="text" id="transactionDescription" name="description" required>
+                </div>
+                <div class="form-group">
+                    <label for="transactionDate">Date</label>
+                    <input type="date" id="transactionDate" name="date" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('transactionModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Budget Modal -->
+    <div class="modal" id="budgetModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create Budget</h3>
+                <button class="modal-close" onclick="closeModal('budgetModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="budgetForm">
+                <div class="form-group">
+                    <label for="budgetCategory">Category</label>
+                    <select id="budgetCategory" name="category" required>
+                        <option value="">Select Category</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="budgetAmount">Monthly Amount</label>
+                    <input type="number" id="budgetAmount" name="amount" step="0.01" min="0" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('budgetModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Budget</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Goal Modal -->
+    <div class="modal" id="goalModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Savings Goal</h3>
+                <button class="modal-close" onclick="closeModal('goalModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="modal-form" id="goalForm">
+                <div class="form-group">
+                    <label for="goalName">Goal Name</label>
+                    <input type="text" id="goalName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="goalTarget">Target Amount</label>
+                    <input type="number" id="goalTarget" name="target" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="goalCurrent">Current Amount</label>
+                    <input type="number" id="goalCurrent" name="current" step="0.01" min="0" value="0">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeModal('goalModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Goal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

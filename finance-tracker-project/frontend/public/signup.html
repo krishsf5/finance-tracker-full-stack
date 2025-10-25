@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - FinanceTracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-chart-line"></i>
+                <span>FinanceTracker</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="features.html" class="nav-link">Features</a></li>
+                <li><a href="pricing.html" class="nav-link">Pricing</a></li>
+                <li><a href="blog.html" class="nav-link">Blog</a></li>
+                <li><a href="login.html" class="nav-link">Login</a></li>
+                <li><a href="signup.html" class="nav-link nav-cta active">Sign Up</a></li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Sign Up Form -->
+    <section class="auth-section">
+        <div class="container">
+            <div class="auth-container">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h1>Create Your Account</h1>
+                        <p>Start your journey to financial freedom today</p>
+                    </div>
+                    
+                    <form class="auth-form" id="signupForm">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <div class="input-group">
+                                <i class="fas fa-user"></i>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <div class="input-group">
+                                <i class="fas fa-envelope"></i>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="password" name="password" required minlength="8">
+                                <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-requirements">
+                                <p>Password must be at least 8 characters long</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="input-group">
+                                <i class="fas fa-lock"></i>
+                                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="terms" required>
+                                <span class="checkmark"></span>
+                                I agree to the <a href="terms.html">Terms of Service</a> and <a href="privacy.html">Privacy Policy</a>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="newsletter">
+                                <span class="checkmark"></span>
+                                Send me tips and updates via email
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                        
+                        <div class="auth-divider">
+                            <span>or</span>
+                        </div>
+                        
+                        <button type="button" class="btn btn-google">
+                            <i class="fab fa-google"></i>
+                            Continue with Google
+                        </button>
+                        
+                        <div class="auth-footer">
+                            <p>Already have an account? <a href="login.html">Sign in here</a></p>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="auth-info">
+                    <h2>Why Choose FinanceTracker?</h2>
+                    <div class="info-features">
+                        <div class="info-feature">
+                            <i class="fas fa-chart-line"></i>
+                            <div>
+                                <h3>Track Everything</h3>
+                                <p>Monitor income, expenses, budgets, and savings goals in one place</p>
+                            </div>
+                        </div>
+                        <div class="info-feature">
+                            <i class="fas fa-mobile-alt"></i>
+                            <div>
+                                <h3>Access Anywhere</h3>
+                                <p>Use our mobile app to track expenses on the go</p>
+                            </div>
+                        </div>
+                        <div class="info-feature">
+                            <i class="fas fa-shield-alt"></i>
+                            <div>
+                                <h3>Bank-Level Security</h3>
+                                <p>Your data is protected with enterprise-grade security</p>
+                            </div>
+                        </div>
+                        <div class="info-feature">
+                            <i class="fas fa-gift"></i>
+                            <div>
+                                <h3>Free to Start</h3>
+                                <p>Start with our free plan and upgrade when you're ready</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-chart-line"></i>
+                        <span>FinanceTracker</span>
+                    </div>
+                    <p>Your personal finance companion for a better financial future.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Cookie Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 FinanceTracker. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        // Sign up form handling
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const terms = document.querySelector('input[name="terms"]').checked;
+            
+            // Validation
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match');
+                return;
+            }
+            
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters long');
+                return;
+            }
+            
+            if (!terms) {
+                alert('Please agree to the Terms of Service and Privacy Policy');
+                return;
+            }
+            
+            // Simulate signup process
+            const userData = {
+                name: name,
+                email: email,
+                password: password,
+                signupTime: new Date().toISOString(),
+                plan: 'free'
+            };
+            
+            // Store user data in localStorage for demo purposes
+            localStorage.setItem('user', JSON.stringify(userData));
+            
+            // Show success message
+            alert('Account created successfully! Redirecting to dashboard...');
+            
+            // Redirect to dashboard
+            window.location.href = 'dashboard.html';
+        });
+        
+        // Password toggle functionality
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const toggle = input.nextElementSibling;
+            const icon = toggle.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+        
+        // Real-time password confirmation validation
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.style.borderColor = '#e74c3c';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+    </script>
+</body>
+</html>

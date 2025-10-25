@@ -2,25 +2,25 @@
   "version": 2,
   "builds": [
     {
-      "src": "frontend/package.json",
+      "src": "finance-tracker-project/frontend/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "frontend/dist"
+        "distDir": "finance-tracker-project/frontend/dist"
       }
     },
     {
-      "src": "backend/server.js",
+      "src": "finance-tracker-project/backend/server.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/server.js"
+      "dest": "finance-tracker-project/backend/server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/dist/$1"
+      "dest": "finance-tracker-project/frontend/dist/$1"
     }
   ],
   "env": {

@@ -1,6 +1,40 @@
 import { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { logout } from '../store/slices/authSlice'
 
 const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
+  const dispatch = useDispatch()
+  const { user } = useSelector(state => state.auth)
+  
+  // Get user initials
+  const getUserInitials = () => {
+    if (!user || !user.name) return 'U'
+    const names = user.name.split(' ')
+    if (names.length >= 2) {
+      return (names[0][0] + names[1][0]).toUpperCase()
+    }
+    return names[0][0].toUpperCase()
+  }
+  
+  // Get display name
+  const getDisplayName = () => {
+    if (!user) return 'User'
+    return user.name || 'User'
+  }
+  
+  // Get email
+  const getUserEmail = () => {
+    if (!user) return 'user@example.com'
+    return user.email || 'user@example.com'
+  }
+  
+  // Handle logout
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to sign out?')) {
+      dispatch(logout())
+    }
+  }
+  
   const menuItems = [
     { id: 'dashboard', name: 'Dashboard', icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z', path: 'M9 12l2 2 4-4' },
     { id: 'transactions', name: 'Transactions', icon: 'M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2', path: 'M9 12l2 2 4-4' },
@@ -67,15 +101,16 @@ const Sidebar = ({ activeTab, setActiveTab, sidebarOpen, setSidebarOpen }) => {
           <div className="px-4 py-4 border-t" style={{ borderColor: 'var(--border-color)' }}>
             <div className="flex items-center space-x-3">
               <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-brand)' }}>
-                <span className="text-sm font-medium text-white">U</span>
+                <span className="text-sm font-medium text-white">{getUserInitials()}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate" style={{ color: 'var(--text-heading)' }}>User Account</p>
-                <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>user@example.com</p>
+                <p className="text-sm font-medium truncate" style={{ color: 'var(--text-heading)' }}>{getDisplayName()}</p>
+                <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>{getUserEmail()}</p>
               </div>
             </div>
             
             <button 
+              onClick={handleLogout}
               className="mt-4 w-full flex items-center px-4 py-2 text-sm rounded-lg transition-colors"
               style={{ color: 'var(--text-body)' }}
               onMouseEnter={(e) => {

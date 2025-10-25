@@ -1,13 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSelector } from 'react-redux'
 
 const Settings = ({ darkMode, onToggleDarkMode }) => {
-  const [settings, setSettings] = useState({
-    currency: 'USD',
-    dateFormat: 'MM/DD/YYYY',
-    notifications: true,
-    autoBackup: true,
-    budgetAlerts: true,
-    emailReports: false
+  const { user } = useSelector(state => state.auth)
+  const [settings, setSettings] = useState(() => {
+    // Load settings from localStorage
+    const savedSettings = localStorage.getItem('appSettings')
+    if (savedSettings) {
+      return JSON.parse(savedSettings)
+    }
+    return {
+      currency: 'USD',
+      dateFormat: 'MM/DD/YYYY',
+      notifications: true,
+      notificationSounds: true,
+      autoBackup: true,
+      budgetAlerts: true,
+      emailReports: false
+    }
   })
 
   const [showChangePassword, setShowChangePassword] = useState(false)
@@ -17,11 +27,70 @@ const Settings = ({ darkMode, onToggleDarkMode }) => {
     confirm: ''
   })
 
-  const handleSettingChange = (key, value) => {
-    setSettings(prev => ({
-      ...prev,
-      [key]: value
-    }))
+  const handleSettingChange = async (key, value) => {
+    // Handle push notifications permission
+    if (key === 'notifications' && value) {
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission()
+        if (permission !== 'granted') {
+          alert('❌ Notification permission denied. Please enable notifications in your browser settings.')
+          return // Don't enable if permission denied
+        }
+      } else {
+        alert('❌ Your browser does not support notifications.')
+        return
+      }
+    }
+    
+    setSettings(prev => {
+      const newSettings = {
+        ...prev,
+        [key]: value
+      }
+      // Save to localStorage
+      localStorage.setItem('appSettings', JSON.stringify(newSettings))
+      return newSettings
+    })
+    
+    // Show feedback messages
+    if (key === 'autoBackup') {
+      const message = value 
+        ? '✅ Auto Backup enabled! Your data will be backed up automatically.' 
+        : '⚠️ Auto Backup disabled. Your data will not be backed up.'
+      setTimeout(() => alert(message), 100)
+    }
+    
+    if (key === 'notifications') {
+      if (value) {
+        setTimeout(() => {
+          alert('🔔 Push Notifications enabled!\n\nYou will receive notifications for:\n• New transactions\n• Important updates\n• System alerts')
+          // Send a test notification
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Finance Tracker', {
+              body: '✅ Notifications are now enabled!',
+              icon: '/favicon.ico',
+              badge: '/favicon.ico'
+            })
+          }
+        }, 100)
+      } else {
+        setTimeout(() => alert('🔕 Push Notifications disabled.'), 100)
+      }
+    }
+    
+    if (key === 'budgetAlerts') {
+      const message = value
+        ? '💰 Budget Alerts enabled!\n\nYou will be notified when:\n• You reach 80% of your budget\n• You exceed your budget\n• Monthly budget resets'
+        : '⚠️ Budget Alerts disabled.'
+      setTimeout(() => alert(message), 100)
+    }
+    
+    if (key === 'emailReports') {
+      const message = value
+        ? '📧 Email Reports enabled!\n\nYou will receive:\n• Weekly spending summary\n• Monthly financial report\n• Category breakdown\n\nSent to: ' + (user?.email || 'your email')
+        : '📧 Email Reports disabled.'
+      setTimeout(() => alert(message), 100)
+    }
   }
 
   const handlePasswordChange = (e) => {
@@ -76,7 +145,7 @@ const Settings = ({ darkMode, onToggleDarkMode }) => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium" style={{ color: 'var(--text-heading)' }}>Email</p>
-                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>user@example.com</p>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{user?.email || 'user@example.com'}</p>
                 </div>
                 <button 
                   className="px-4 py-2 text-sm font-medium"
@@ -237,6 +306,29 @@ const Settings = ({ darkMode, onToggleDarkMode }) => {
                     style={{
                       backgroundColor: 'white',
                       transform: settings.notifications ? 'translateX(1.5rem)' : 'translateX(0.25rem)',
+                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
+                    }}
+                  />
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium" style={{ color: 'var(--text-heading)' }}>Notification Sounds</p>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Play sound when receiving notifications</p>
+                </div>
+                <button
+                  onClick={() => handleSettingChange('notificationSounds', !settings.notificationSounds)}
+                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+                  style={{
+                    backgroundColor: settings.notificationSounds ? 'var(--color-brand)' : 'var(--border-color)'
+                  }}
+                >
+                  <span
+                    className="inline-block h-4 w-4 transform rounded-full transition-transform"
+                    style={{
+                      backgroundColor: 'white',
+                      transform: settings.notificationSounds ? 'translateX(1.5rem)' : 'translateX(0.25rem)',
                       boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)'
                     }}
                   />

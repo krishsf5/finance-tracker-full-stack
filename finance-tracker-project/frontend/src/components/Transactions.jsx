@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { createTransaction, deleteTransaction as deleteTransactionAction, getTransactions } from '../store/slices/transactionSlice'
+import notificationService from '../utils/notificationService'
 
 const Transactions = () => {
   const dispatch = useDispatch()
@@ -44,9 +45,17 @@ const Transactions = () => {
     }
     
     try {
-      await dispatch(createTransaction(transactionData)).unwrap()
+      const result = await dispatch(createTransaction(transactionData)).unwrap()
       setShowAddModal(false)
       e.target.reset()
+      
+      // Send notification for new transaction
+      notificationService.transactionAdded({
+        ...result,
+        type: transactionData.type,
+        amount: transactionData.type === 'income' ? transactionData.amount : -transactionData.amount
+      })
+      
       // Refresh transactions list
       dispatch(getTransactions({ page: 1, limit: 100 }))
     } catch (err) {

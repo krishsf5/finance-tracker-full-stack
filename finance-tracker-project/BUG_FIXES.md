@@ -3,15 +3,17 @@
 ## Issue 1: User Name Not Displayed ✅
 
 ### Problem:
-After creating an account and logging in, the header showed "User" instead of the actual user's name. The email was being displayed somewhere instead of the name.
+After creating an account and logging in, the header and sidebar showed "User" instead of the actual user's name. The email was hardcoded as "user@example.com" everywhere.
 
 ### Root Cause:
-The `Header` component had hardcoded values:
-- Avatar initials: `"U"` (hardcoded)
-- Display name: `"User"` (hardcoded)
-- The component received `user` prop but didn't use it
+Multiple components had hardcoded values:
+- **Header:** Avatar initials `"U"` and display name `"User"` (hardcoded)
+- **Sidebar:** Avatar `"U"`, name `"User Account"`, email `"user@example.com"` (hardcoded)
+- **Settings:** Email `"user@example.com"` (hardcoded)
 
 ### Fix Applied:
+
+#### 1. Header Component
 **File:** `frontend/src/components/Header.jsx`
 
 1. Added `user` prop to component
@@ -37,11 +39,60 @@ The `Header` component had hardcoded values:
    <span>{getDisplayName()}</span>   // Instead of "User"
    ```
 
+#### 2. Sidebar Component
+**File:** `frontend/src/components/Sidebar.jsx`
+
+1. Added Redux imports and user state:
+   ```javascript
+   import { useSelector, useDispatch } from 'react-redux'
+   import { logout } from '../store/slices/authSlice'
+   
+   const { user } = useSelector(state => state.auth)
+   ```
+
+2. Created helper functions:
+   ```javascript
+   const getUserInitials = () => { /* ... */ }
+   const getDisplayName = () => { /* ... */ }
+   const getUserEmail = () => { /* ... */ }
+   ```
+
+3. Updated JSX:
+   ```javascript
+   <span>{getUserInitials()}</span>     // Instead of "U"
+   <p>{getDisplayName()}</p>            // Instead of "User Account"
+   <p>{getUserEmail()}</p>              // Instead of "user@example.com"
+   ```
+
+4. **Bonus:** Implemented logout functionality:
+   ```javascript
+   const handleLogout = () => {
+     if (window.confirm('Are you sure you want to sign out?')) {
+       dispatch(logout())
+     }
+   }
+   ```
+
+#### 3. Settings Component
+**File:** `frontend/src/components/Settings.jsx`
+
+1. Added Redux hook:
+   ```javascript
+   import { useSelector } from 'react-redux'
+   const { user } = useSelector(state => state.auth)
+   ```
+
+2. Updated email display:
+   ```javascript
+   <p>{user?.email || 'user@example.com'}</p>
+   ```
+
 ### Result:
-- Now shows user's initials (e.g., "JD" for John Doe)
-- Displays user's actual name in the header
-- Falls back to email if name is missing
-- Falls back to "User" if both are missing
+- ✅ Header shows user's initials (e.g., "JD" for John Doe) and name
+- ✅ Sidebar shows correct user initials, name, and email
+- ✅ Settings page shows actual user email
+- ✅ **Sign out button now works!** (logs user out and returns to login page)
+- Falls back to defaults if user data is missing
 
 ---
 
@@ -180,7 +231,17 @@ return response.data.data.trends;
    - Created helper functions for initials and display name
    - Updated JSX to use dynamic values
 
-2. `frontend/src/store/slices/transactionSlice.js`
+2. `frontend/src/components/Sidebar.jsx`
+   - Added Redux integration for user state
+   - Created helper functions for user display
+   - Implemented logout functionality
+   - Updated JSX to show actual user data
+
+3. `frontend/src/components/Settings.jsx`
+   - Added Redux hook to access user data
+   - Updated email display to use actual user email
+
+4. `frontend/src/store/slices/transactionSlice.js`
    - Fixed 6 thunk response paths
    - All now correctly access nested data structure
 
@@ -240,7 +301,11 @@ Frontend should **always** access: `response.data.data.{property}`
 **All features now working:**
 - ✅ User registration
 - ✅ User login
+- ✅ User logout (working Sign out button!)
 - ✅ User name display in header
+- ✅ User name display in sidebar
+- ✅ User email display in settings
+- ✅ User initials in avatars
 - ✅ Create transactions
 - ✅ View transactions list
 - ✅ Delete transactions

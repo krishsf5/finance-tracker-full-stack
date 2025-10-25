@@ -18,13 +18,28 @@ function AppWithRedux() {
   
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => {
+    // Load dark mode preference from localStorage
+    const savedMode = localStorage.getItem('darkMode')
+    return savedMode === 'true'
+  })
   const [showRegister, setShowRegister] = useState(false)
 
   // Initialize auth on app load
   useEffect(() => {
     dispatch(initializeAuth())
   }, [dispatch])
+
+  // Apply dark mode on mount and when it changes
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', darkMode.toString())
+  }, [darkMode])
 
   // Load transactions when user is authenticated
   useEffect(() => {
@@ -40,13 +55,7 @@ function AppWithRedux() {
   }, 0)
 
   const toggleDarkMode = () => {
-    const newDarkMode = !darkMode
-    setDarkMode(newDarkMode)
-    if (newDarkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
+    setDarkMode(prev => !prev)
   }
 
   const renderContent = () => {

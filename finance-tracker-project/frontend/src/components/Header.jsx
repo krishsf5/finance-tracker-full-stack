@@ -1,7 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import NotificationCenter from './NotificationCenter'
+import notificationService from '../utils/notificationService'
 
 const Header = ({ sidebarOpen, setSidebarOpen, balance, user }) => {
   const [showBalance, setShowBalance] = useState(true)
+  const [showNotifications, setShowNotifications] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
+
+  useEffect(() => {
+    // Load initial unread count
+    setUnreadCount(notificationService.getUnreadCount())
+
+    // Listen for notification updates
+    const updateCount = () => {
+      setUnreadCount(notificationService.getUnreadCount())
+    }
+
+    window.addEventListener('notificationAdded', updateCount)
+    window.addEventListener('notificationRead', updateCount)
+    window.addEventListener('allNotificationsRead', updateCount)
+    window.addEventListener('notificationsCleared', updateCount)
+
+    return () => {
+      window.removeEventListener('notificationAdded', updateCount)
+      window.removeEventListener('notificationRead', updateCount)
+      window.removeEventListener('allNotificationsRead', updateCount)
+      window.removeEventListener('notificationsCleared', updateCount)
+    }
+  }, [])
   
   // Get user initials
   const getUserInitials = () => {
@@ -70,22 +96,30 @@ const Header = ({ sidebarOpen, setSidebarOpen, balance, user }) => {
 
             {/* Notifications */}
             <button 
+              onClick={() => setShowNotifications(true)}
               className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset relative"
               style={{ 
                 color: 'var(--text-body)',
                 focusRingColor: 'var(--color-brand)'
               }}
               onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'var(--hover-bg)'
-                e.target.style.color = 'var(--text-heading)'
+                e.currentTarget.style.backgroundColor = 'var(--hover-bg)'
+                e.currentTarget.style.color = 'var(--text-heading)'
               }}
               onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'transparent'
-                e.target.style.color = 'var(--text-body)'
+                e.currentTarget.style.backgroundColor = 'transparent'
+                e.currentTarget.style.color = 'var(--text-body)'
               }}
             >
-              <i className="fas fa-bell text-xl" style={{ color: '#FFD700' }}></i>
-              <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-400 ring-2 ring-white"></span>
+              <i className="fas fa-bell text-xl" style={{ color: unreadCount > 0 ? '#FFD700' : 'var(--text-muted)' }}></i>
+              {unreadCount > 0 && (
+                <span 
+                  className="absolute top-0 right-0 flex items-center justify-center h-5 w-5 text-xs font-bold text-white rounded-full"
+                  style={{ backgroundColor: 'var(--color-danger)' }}
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
             </button>
 
             {/* User Profile */}
@@ -98,6 +132,12 @@ const Header = ({ sidebarOpen, setSidebarOpen, balance, user }) => {
           </div>
         </div>
       </div>
+
+      {/* Notification Center */}
+      <NotificationCenter 
+        isOpen={showNotifications}
+        onClose={() => setShowNotifications(false)}
+      />
     </header>
   )
 }

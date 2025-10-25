@@ -90,42 +90,37 @@ app.use('/api/goals', goalRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-// Database connection
+// Database connection with connection pooling for serverless
 const connectDB = async () => {
+  // Check if already connected
+  if (mongoose.connection.readyState >= 1) {
+    return;
+  }
+
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
+    await mongoose.connect(process.env.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
     });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${mongoose.connection.host}`);
   } catch (error) {
     console.error('Database connection error:', error);
-    process.exit(1);
+    throw error;
   }
 };
 
-// Start server
-const PORT = process.env.PORT || 5000;
+// Connect to database before handling requests
+connectDB().catch(err => console.error('Initial DB connection failed:', err));
 
-const startServer = async () => {
-  await connectDB();
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
   });
-};
-
-// Handle unhandled promise rejections
-process.on('unhandledRejection', (err, promise) => {
-  console.log('Unhandled Promise Rejection:', err.message);
-  process.exit(1);
-});
-
-// Handle uncaught exceptions
-process.on('uncaughtException', (err) => {
-  console.log('Uncaught Exception:', err.message);
-  process.exit(1);
-});
-
-startServer();
+}
 
 module.exports = app;
